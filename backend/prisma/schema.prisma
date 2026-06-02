@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+//user section
+// Define the Role enum
+enum Role {
+  USER
+  ADMIN
+}
+// Define the User model
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  password  String
+  firstName String?
+  lastName  String?
+  role      Role      @default(USER)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@map("users")
+}
+
+//contacts section
+// Define the Contact model
+model Contact {
+  id          String   @id @default(uuid())
+
+  firstName   String
+  lastName    String
+
+  email       String?  @unique
+  phone       String?
+
+  company     String?
+  jobTitle    String?
+
+  status      ContactStatus @default(NEW)
+
+  source      String?
+
+  assignedToId String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  notes       ContactNote[]
+  activities  ContactActivity[]
+
+  @@map("contacts")
+}
+// Define the ContactStatus enum
+enum ContactStatus {
+  NEW
+  IN_PROGRESS
+  CUSTOMER
+  CLOSED
+}
+// Define the ContactNote model
+model ContactNote {
+  id          String   @id @default(uuid())
+
+  content     String
+
+  contactId   String
+  contact     Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+
+  @@map("contact_notes")
+}
+
+// Define the ContactActivity model
+model ContactActivity {
+  id          String   @id @default(uuid())
+
+  type        String
+  description String
+
+  contactId   String
+  contact     Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+
+  @@map("contact_activities")
+}
