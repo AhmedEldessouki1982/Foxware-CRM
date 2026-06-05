@@ -3,6 +3,7 @@ import Dashboard from "./pages/dashboard/Dashboard";
 import Home from "./pages/Home";
 import ProtectedLayout from "./pages/ProtectedLayout";
 import Contacts from "./pages/contacts/Contacts";
+import Deals from "./pages/deals/Deals";
 
 export default function Router() {
   return (
@@ -15,6 +16,8 @@ export default function Router() {
         <Route element={<ProtectedLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/contacts" element={<Contacts />} />
+          <Route path="/deals" element={<Deals />} />
+
           {/* add more protected pages here */}
         </Route>
 
