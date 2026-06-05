@@ -32,8 +32,31 @@ export const useContact = () => {
     return contactsApi.getContacts();
   };
 
+  //Delete a contact
+  const deleteContact = async (id: string): Promise<void> => {
+    if (!isAuthenticated) {
+      throw new Error("User is not authenticated");
+    }
+
+    return contactsApi.deleteContact(id);
+  };
+
+  //Update a contact
+  const updateContact = async (
+    id: string,
+    contact: Contact,
+  ): Promise<Contact> => {
+    if (!isAuthenticated) {
+      throw new Error("User is not authenticated");
+    }
+
+    return contactsApi.updateContact(id, contact);
+  };
+
   return {
     createContact,
     getContacts,
+    deleteContact,
+    updateContact,
   };
 };

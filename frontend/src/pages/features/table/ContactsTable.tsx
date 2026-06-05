@@ -116,12 +116,6 @@ export default function ContactsTable({
                 )}
               </p>
             </div>
-            <Button
-              onClick={() => navigate("/contacts/new")}
-              className="bg-blue-500 hover:bg-blue-400 text-white text-sm px-4 py-2 rounded-lg transition-all"
-            >
-              + Add Contact
-            </Button>
           </div>
         </div>
 

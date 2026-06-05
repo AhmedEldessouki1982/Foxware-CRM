@@ -42,7 +42,7 @@ export const createContact = async (
 // Update an existing contact by ID
 export const updateContact = async (
   id: string,
-  contact: Omit<Contact, "id" | "createdAt" | "updatedAt" | "deletedAt">,
+  contact: Contact,
 ): Promise<Contact> => {
   const response = await apiContacts.patch(
     `${API_BASE_URL}/contacts/${id}`,

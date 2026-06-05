@@ -31,7 +31,6 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import ContactsTable from "@/pages/features/table/ContactsTable";
 import type { Contact } from "@/interfaces/Contact";
 import { useContact } from "@/hooks/useContact";
-import { contactsApi } from "@/api/contacts";
 
 // Define status options
 const STATUS_OPTIONS = ["NEW", "IN_PROGRESS", "CUSTOMER", "CLOSED"] as const;
@@ -65,7 +64,9 @@ function Contacts() {
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
   const [deletingContact, setDeletingContact] = useState<Contact | null>(null);
   const [form, setForm] = useState<ContactForm>(EMPTY_FORM);
-  const { getContacts, createContact } = useContact();
+  // Use custom hook for contact operations
+  const { getContacts, createContact, deleteContact, updateContact } =
+    useContact();
 
   // Fetch contacts using React Query
   const { data: contacts = [], isPending } = useQuery({
@@ -96,6 +97,7 @@ function Contacts() {
     },
   });
 
+  // Mutation for updating a contact
   const updateMutation = useMutation({
     mutationFn: ({
       id,
@@ -103,27 +105,40 @@ function Contacts() {
     }: {
       id: string;
       payload: Partial<ContactForm>;
-    }) => contactsApi.updateContact(id, payload as Partial<Contact>),
+    }) => {
+      const { notes, ...contactData } = payload;
+
+      return updateContact(id, contactData as Contact);
+    },
+
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contacts"] });
       toast.success("Contact updated successfully");
       handleCloseDialog();
     },
-    onError: () => {
-      toast.error("Failed to update contact");
+
+    onError: (err) => {
+      toast.error(
+        `Failed to update contact - ${
+          err instanceof Error ? err.message : "Unknown error"
+        }`,
+      );
     },
   });
 
+  // Mutation for deleting a contact
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => contactsApi.deleteContact(id),
+    mutationFn: (id: string) => deleteContact(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contacts"] });
       toast.success("Contact deleted successfully");
       setDeleteDialogOpen(false);
       setDeletingContact(null);
     },
-    onError: () => {
-      toast.error("Failed to delete contact");
+    onError: (err) => {
+      toast.error(
+        ` Failed to delete contact - ${err instanceof Error ? err.message : "Unknown error"}`,
+      );
     },
   });
 
@@ -171,6 +186,7 @@ function Contacts() {
     [editingContact, form, createMutation, updateMutation],
   );
 
+  // Handle mutation success and error states for better UX
   const isMutating = createMutation.isPending || updateMutation.isPending;
 
   return (
